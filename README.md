@@ -6,17 +6,18 @@ Currently, the following stacks can be installed.
 
 - [Sensu](http://sensuapp.org/) (including [Uchiwa](https://github.com/palourde/uchiwa))
 - [Flapjack](http://flapjack.io/)
-- [Logstash](http://logstash.net/) (with [Elasticsearch](http://www.elasticsearch.org/overview/elasticsearch/)/[Kibana](http://www.elasticsearch.org/overview/kibana/) and [logstash-forwarder](https://github.com/elasticsearch/logstash-forwarder))
-- Etsy's [Kale](http://codeascraft.com/2013/06/11/introducing-kale/) stack ([Skyline](https://github.com/etsy/skyline) for anomaly detection, [Oculus](https://github.com/etsy/oculus) for correlation)
+- [Logstash](http://logstash.net/) (with [Elasticsearch](https://www.elastic.co/products/elasticsearch)/[Kibana](https://www.elastic.co/products/kibana) and [logstash-forwarder](https://github.com/elastic/logstash-forwarder))
 - [Heka](https://hekad.readthedocs.org/en/latest/)
 - [Sentry](http://sentry.readthedocs.org/en/latest/)
-- [Graylog2](http://graylog2.org/) (including standard and [streaming](https://github.com/Graylog2/graylog2-stream-dashboard) dashboards)
+- [Tessera](http://urbanairship.github.io/tessera/)
+- [Graylog](http://graylog.org/)
 - [Statsd](https://github.com/etsy/statsd/)
 - [Graphite](https://graphite.readthedocs.org/en/latest/) (with [Grafana](http://grafana.org/))
 - [InfluxDB](http://influxdb.com/)
 - [Flume](http://flume.apache.org/)
 - [Fluentd](http://fluentd.org/)
 - [OpenTSDB](http://opentsdb.net/) and [TCollector](http://opentsdb.net/docs/build/html/user_guide/utilities/tcollector.html)
+- [Cachet](https://cachethq.io/)
 
 This repository started off from the ideas on my [Monitoring Everything](http://ianunruh.com/2014/05/monitor-everything.html) blog series.
 
@@ -50,17 +51,17 @@ Two Vagrant boxes are provided with this script.
 
 The `monitoring` box is intended for the different monitoring stacks, while `app1` is intended to try out clients.
 
-### Sensu/Logstash/Skyline
+### Sensu/Logstash
 
 The `monitoring` box provides the following:
 
-- [Kibana](http://192.168.12.10/kibana)
-- [Grafana](http://192.168.12.10/grafana)
-- [Skyline](http://192.168.12.10:1500) (best viewed in Chrome)
-- [Oculus](http://192.168.12.10:3000)
+- [Kibana](http://192.168.12.10:5601)
+- [Tessera](http://192.168.12.10:5000)
+- [Grafana](http://192.168.12.10:3000)
 - [Flapjack](http://192.168.12.10:3080)
 - [Uchiwa](http://192.168.12.10:8010)
 - [ElasticHQ](http://192.168.12.10:9200/_plugin/HQ)
+- [Cachet](http://192.168.12.10:4477)
 
 For client nodes, it provides:
 
@@ -88,7 +89,7 @@ cd /vagrant && ./install-all-opentsdb.sh
 
 This script also installs Grafana with the OpenTSDB backend configured. Elasticsearch is installed as a dashboard store for Grafana.
 
-- [Grafana](http://192.168.12.10/grafana)
+- [Grafana](http://192.168.12.10:3000)
 - [OpenTSDB dashboard](http://192.168.12.10:4242/)
 
 TCollector is installed on the monitoring host to provide some sample metrics. Note that this script can take more than 10 minutes to install, depending on your bandwidth.
@@ -123,9 +124,9 @@ cd /vagrant && ./install-all-sentry.sh
 
 After installation, the [Sentry web interface](http://192.168.12.10:9000) should be available. Login with the username `admin` and the password `secret`.
 
-### Graylog2
+### Graylog
 
-To install Graylog2 with the web interface and stream dashboard, simply use the following.
+To install Graylog with the web interface, simply use the following.
 
 ```sh
 vagrant up --no-provision monitoring
@@ -134,15 +135,10 @@ vagrant ssh monitoring
 
 ```sh
 sudo -i
-cd /vagrant && ./install-all-graylog2.sh
+cd /vagrant && ./install-all-graylog.sh
 ```
 
-After installation, you can access one of the following resources. Use the username `admin` and the passwod `password`.
-
-- [Web interface](http://192.168.12.10:8400/)
-- [Streaming dashboard](http://192.168.12.10/graylog2-streaming-dashboard)
-
-Note that Graylog2 requires its own Elasticsearch cluster, so **do not** use this script on the same node as other installation scripts.
+After installation, you can access one the [web interface](http://192.168.12.10:8940/). Use the username `admin` and the password `password`.
 
 ### Heka
 
@@ -161,7 +157,7 @@ cd /vagrant && ./install-all-heka.sh
 This package provides the following:
 
 - [Heka dashboard](http://192.168.12.10:4352/)
-- [Kibana](http://192.168.12.10/kibana/)
+- [Kibana](http://192.168.12.10:5601)
 - [ElasticHQ](http://192.168.12.10:9200/_plugin/HQ/)
 - Heka Protobuf input on `192.168.12.10` at TCP port 5565
 
@@ -181,7 +177,7 @@ cd /vagrant && ./install-all-influxdb.sh
 
 This package provides the following:
 
-- [Grafana](http://192.168.12.10/grafana) configured for InfluxDB
+- [Grafana](http://192.168.12.10:3000) configured for InfluxDB
 - [InfluxDB admin interface](http://192.168.12.10:8083/) with default credentials
 - [Uchiwa](http://192.168.12.10:8010) dashboard for Sensu
 
@@ -203,7 +199,7 @@ cd /vagrant && ./install-all-flume.sh
 
 This package provides the following:
 
-- [Kibana](http://192.168.12.10/kibana/)
+- [Kibana](http://192.168.12.10:5601)
 - [ElasticHQ](http://192.168.12.10:9200/_plugin/HQ/)
 - Avro input on `192.168.12.10` at TCP port 41414
 - Syslog input on `192.168.12.10` at TCP port 1514
@@ -226,7 +222,7 @@ cd /vagrant && ./install-all-fluentd.sh
 
 This package provides the following:
 
-- [Kibana](http://192.168.12.10/kibana/)
+- [Kibana](http://192.168.12.10:5601)
 - [ElasticHQ](http://192.168.12.10:9200/_plugin/HQ/)
 - HTTP input on `192.168.12.10` at TCP port 9880
 - Syslog input on `192.168.12.10` at TCP port 1514
